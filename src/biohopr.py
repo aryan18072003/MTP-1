@@ -66,15 +66,20 @@ def generate_answer(question: str) -> str:
         {"role": "system", "content": "Provide exactly one specific answer."},
         {"role": "user", "content": question},
     ]
-    outputs = llm_pipeline(messages, max_new_tokens=50, temperature=0.0, do_sample=False)
+    outputs = llm_pipeline(messages, max_new_tokens=50, do_sample=False)
     return outputs[0]["generated_text"][-1]["content"].strip()
 
 
 def evaluate_instance(prediction: str, targets: list, threshold: float = 0.9):
     """Evaluate a prediction against target entities using cosine similarity."""
+    if not targets:
+        print("Warning: No target entities found for this sample.")
+        return False, 0.0
     with torch.no_grad():
         pred_emb = embedder.encode(prediction, convert_to_tensor=True)
         target_embs = embedder.encode(targets, convert_to_tensor=True)
+        if target_embs.dim() == 1:
+            target_embs = target_embs.unsqueeze(0)
         cos_sims = F.cosine_similarity(pred_emb.unsqueeze(0), target_embs)
         max_sim = torch.max(cos_sims).item()
     return max_sim > threshold, max_sim
@@ -82,11 +87,17 @@ def evaluate_instance(prediction: str, targets: list, threshold: float = 0.9):
 
 # ── Run on First Sample ─────────────────────────────────────────────────────
 if __name__ == "__main__":
+    # Print available columns for reference
+    print(f"\nDataset columns: {list(benchmark_df.columns)}")
+
     sample_row = benchmark_df.iloc[0]
-    question = sample_row.get("question_single")
-    targets = sample_row.get("target_entities", [])
+    question = sample_row.get("prompt") or sample_row.get("question_single")
+    targets = sample_row.get("answer", [])
+    if isinstance(targets, str):
+        targets = [targets]
 
     print(f"\nQuestion: {question}")
+    print(f"Targets: {targets}")
 
     prediction = generate_answer(question)
     is_correct, score = evaluate_instance(prediction, targets)
