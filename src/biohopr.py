@@ -72,7 +72,7 @@ def generate_answer(question: str) -> str:
 
 def evaluate_instance(prediction: str, targets: list, threshold: float = 0.9):
     """Evaluate a prediction against target entities using cosine similarity."""
-    if not targets:
+    if targets is None or len(targets) == 0:
         print("Warning: No target entities found for this sample.")
         return False, 0.0
     with torch.no_grad():
