@@ -1,17 +1,3 @@
-"""
-LLM Evaluation
-Evaluates Llama-3.2-3B on all BioHopR samples with checkpoint/resume support.
-
-Usage:
-    python evaluate_llm.py               # Run full evaluation
-    python evaluate_llm.py --max-samples 50  # Quick test with 50 samples
-
-Outputs (saved to src/results/):
-  - evaluation_results.csv
-  - evaluation_summary.png
-  - accuracy_by_node_type.png
-"""
-
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -30,11 +16,10 @@ from utils import (
 
 sns.set_theme(style="whitegrid", font_scale=1.2)
 
-CHECKPOINT_INTERVAL = 50  # Save every N samples
+CHECKPOINT_INTERVAL = 50
 
 
 def load_checkpoint():
-    """Load existing evaluation results for resume support."""
     if os.path.exists(EVAL_RESULTS_PATH):
         df = pd.read_csv(EVAL_RESULTS_PATH)
         print(f"  Loaded checkpoint: {len(df)} samples already evaluated")
@@ -43,20 +28,13 @@ def load_checkpoint():
 
 
 def save_checkpoint(results_df):
-    """Save current results to CSV."""
     results_df.to_csv(EVAL_RESULTS_PATH, index=False)
 
 
 def evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=None):
-    """
-    Evaluate the LLM on all BioHopR samples.
-    Supports resume from checkpoint.
-    """
-    # Load existing results
     existing_df = load_checkpoint()
     completed_indices = set(existing_df["sample_idx"].tolist()) if len(existing_df) > 0 else set()
 
-    # Determine samples to process
     total_samples = len(benchmark_df)
     if max_samples:
         total_samples = min(max_samples, total_samples)
@@ -84,7 +62,6 @@ def evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=None):
         relation_hop1 = row.get("relation_hop1", "")
         relation_hop2 = row.get("relation_hop2", "")
 
-        # ── Evaluate hop1_question (1-hop) ───────────────────────────────
         hop1_q = row.get("hop1_question")
         hop1_pred, hop1_correct, hop1_sim = "", False, 0.0
         if pd.notna(hop1_q) and hop1_q:
@@ -92,9 +69,8 @@ def evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=None):
                 hop1_pred = generate_answer(llm_pipe, hop1_q)
                 hop1_correct, hop1_sim = evaluate_instance(embedder, hop1_pred, targets)
             except Exception as e:
-                print(f"  ⚠ Error on sample {idx} (hop1): {e}")
+                print(f"  Error on sample {idx} (hop1): {e}")
 
-        # ── Evaluate hop2_question (2-hop) ───────────────────────────────
         hop2_q = row.get("hop2_question")
         hop2_pred, hop2_correct, hop2_sim = "", False, 0.0
         if pd.notna(hop2_q) and hop2_q:
@@ -102,7 +78,7 @@ def evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=None):
                 hop2_pred = generate_answer(llm_pipe, hop2_q)
                 hop2_correct, hop2_sim = evaluate_instance(embedder, hop2_pred, targets)
             except Exception as e:
-                print(f"  ⚠ Error on sample {idx} (hop2): {e}")
+                print(f"  Error on sample {idx} (hop2): {e}")
 
         results.append({
             "sample_idx": idx,
@@ -133,23 +109,19 @@ def evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=None):
                   f"hop1_sim={hop1_sim:.3f} hop2_sim={hop2_sim:.3f} "
                   f"({rate:.1f} samples/s, ~{remaining / 60:.0f}m remaining)")
 
-        # Checkpoint
         if new_count % CHECKPOINT_INTERVAL == 0:
             save_checkpoint(pd.DataFrame(results))
-            print(f"  💾 Checkpoint saved ({len(results)} total results)")
+            print(f"  Checkpoint saved ({len(results)} total results)")
 
-    # Final save
     results_df = pd.DataFrame(results)
     save_checkpoint(results_df)
-    print(f"\n  ✓ Evaluation complete: {len(results_df)} total results")
+    print(f"\n  Evaluation complete: {len(results_df)} total results")
     return results_df
 
 
 def plot_evaluation_summary(results_df):
-    """Generate summary plots from evaluation results."""
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
-    # ── 1. Overall accuracy ──────────────────────────────────────────────
     ax = axes[0]
     hop1_mask = results_df["hop1_question"].astype(str).str.len() > 0
     hop2_mask = results_df["hop2_question"].astype(str).str.len() > 0
@@ -166,7 +138,6 @@ def plot_evaluation_summary(results_df):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.5,
                 f"{acc:.1f}%", ha="center", va="bottom", fontsize=12, fontweight="bold")
 
-    # ── 2. Similarity distribution ───────────────────────────────────────
     ax = axes[1]
     if hop1_mask.any():
         ax.hist(results_df.loc[hop1_mask, "hop1_similarity"], bins=30, alpha=0.6,
@@ -180,7 +151,6 @@ def plot_evaluation_summary(results_df):
     ax.set_title("Similarity Distribution", fontweight="bold")
     ax.legend(fontsize=9)
 
-    # ── 3. Mean similarity by target type ────────────────────────────────
     ax = axes[2]
     sim_by_type = results_df.groupby("target_type").agg(
         hop1_mean=("hop1_similarity", "mean"),
@@ -203,20 +173,18 @@ def plot_evaluation_summary(results_df):
     plt.savefig(os.path.join(RESULTS_DIR, "evaluation_summary.png"),
                 dpi=150, bbox_inches="tight")
     plt.close()
-    print("  ✓ Saved evaluation_summary.png")
+    print("  Saved evaluation_summary.png")
 
-    # ── Accuracy by node type combination ────────────────────────────────
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
 
     for ax, correct_col, title in zip(
         axes,
         ["hop1_correct", "hop2_correct"],
-        ["1-Hop Accuracy by (Hop1 Type → Target Type)", "2-Hop Accuracy by (Hop1 Type → Target Type)"],
+        ["1-Hop Accuracy by (Hop1 Type -> Target Type)", "2-Hop Accuracy by (Hop1 Type -> Target Type)"],
     ):
         acc_pivot = results_df.groupby(["hop1_type", "target_type"])[correct_col].mean().unstack(fill_value=0) * 100
         count_pivot = results_df.groupby(["hop1_type", "target_type"]).size().unstack(fill_value=0)
 
-        # Create annotation with accuracy + count
         annot = acc_pivot.copy().astype(str)
         for i in acc_pivot.index:
             for j in acc_pivot.columns:
@@ -233,7 +201,7 @@ def plot_evaluation_summary(results_df):
     plt.tight_layout()
     plt.savefig(os.path.join(RESULTS_DIR, "accuracy_by_node_type.png"), dpi=150)
     plt.close()
-    print("  ✓ Saved accuracy_by_node_type.png")
+    print("  Saved accuracy_by_node_type.png")
 
 
 if __name__ == "__main__":
@@ -255,7 +223,6 @@ if __name__ == "__main__":
     print("\nGenerating plots...")
     plot_evaluation_summary(results_df)
 
-    # Print summary
     hop1_mask = results_df["hop1_question"].astype(str).str.len() > 0
     hop2_mask = results_df["hop2_question"].astype(str).str.len() > 0
     print(f"\n{'=' * 60}")
@@ -269,4 +236,4 @@ if __name__ == "__main__":
         print(f"2-hop accuracy: {results_df.loc[hop2_mask, 'hop2_correct'].mean() * 100:.2f}%")
         print(f"2-hop mean similarity: {results_df.loc[hop2_mask, 'hop2_similarity'].mean():.3f}")
 
-    print("\n✅ Step 3 complete — results saved to results/")
+    print("\n Step 3 complete")

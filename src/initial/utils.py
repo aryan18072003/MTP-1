@@ -1,8 +1,3 @@
-"""
-Shared utilities for the Knowledge Footprint pipeline.
-Contains model loading, evaluation functions, config constants, and helpers.
-"""
-
 import os
 import torch
 import torch.nn.functional as F
@@ -11,10 +6,8 @@ import numpy as np
 from datasets import load_dataset
 from huggingface_hub import login
 
-# ── Path Setup (relative to src/, one level up from initial/) ────────────────
 SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# ── Config Constants ─────────────────────────────────────────────────────────
 HF_TOKEN = "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"
 MODEL_NAME = "meta-llama/Llama-3.2-3B-Instruct"
 EMBEDDER_NAME = "FremyCompany/BioLORD-2023-C"
@@ -24,29 +17,25 @@ RESULTS_DIR = os.path.join(SRC_DIR, "results")
 EVAL_RESULTS_PATH = os.path.join(RESULTS_DIR, "evaluation_results.csv")
 COSINE_THRESHOLD = 0.9
 
-# BioHopR focuses on these 4 node types
 BIOHOPR_NODE_TYPES = ["drug", "disease", "gene/protein", "effect/phenotype"]
 
 
 def setup_device():
-    """Detect and return the best available device."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Using device: {device}")
     return device
 
 
 def authenticate_hf():
-    """Login to Hugging Face Hub."""
     login(token=HF_TOKEN)
 
 
 def load_kg():
-    """Load PrimeKG, converting CSV to Parquet on first run for speed."""
     if os.path.exists(KG_PARQUET_PATH):
         print("Loading KG from parquet (fast path)...")
         kg_df = pd.read_parquet(KG_PARQUET_PATH)
     else:
-        print("Loading KG from CSV (first run — converting to parquet)...")
+        print("Loading KG from CSV (first run - converting to parquet)...")
         kg_df = pd.read_csv(KG_CSV_PATH, low_memory=False)
         kg_df.to_parquet(KG_PARQUET_PATH, index=False)
         print(f"Saved parquet to {KG_PARQUET_PATH}")
@@ -55,7 +44,6 @@ def load_kg():
 
 
 def load_biohopr():
-    """Load the BioHopR benchmark dataset."""
     print("Loading BioHopR benchmark dataset...")
     biohopr = load_dataset("knowlab-research/BioHopR")
     benchmark_df = biohopr["train"].to_pandas()
@@ -64,7 +52,6 @@ def load_biohopr():
 
 
 def load_llm(device):
-    """Load the LLM and return (pipeline, tokenizer, model)."""
     from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 
     print(f"Loading tokenizer and model: {MODEL_NAME}...")
@@ -78,7 +65,6 @@ def load_llm(device):
     if device == "cpu":
         model.to(device)
 
-    # Set pad token to avoid warnings
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
@@ -88,7 +74,6 @@ def load_llm(device):
 
 
 def load_embedder(device):
-    """Load the sentence embedding model."""
     from sentence_transformers import SentenceTransformer
 
     print(f"Loading sentence embedder ({EMBEDDER_NAME})...")
@@ -98,7 +83,6 @@ def load_embedder(device):
 
 
 def generate_answer(llm_pipe, question: str) -> str:
-    """Generate an answer from the LLM given a question."""
     messages = [
         {"role": "system", "content": "Provide exactly one specific answer."},
         {"role": "user", "content": question},
@@ -108,11 +92,6 @@ def generate_answer(llm_pipe, question: str) -> str:
 
 
 def evaluate_instance(embedder, prediction: str, targets, threshold: float = COSINE_THRESHOLD):
-    """
-    Evaluate a prediction against target entities using cosine similarity.
-    Returns (is_correct: bool, max_similarity: float).
-    """
-    # Handle various target formats
     if targets is None:
         return False, 0.0
     if isinstance(targets, str):
@@ -133,5 +112,4 @@ def evaluate_instance(embedder, prediction: str, targets, threshold: float = COS
 
 
 def ensure_results_dir():
-    """Create the results directory if it doesn't exist."""
     os.makedirs(RESULTS_DIR, exist_ok=True)

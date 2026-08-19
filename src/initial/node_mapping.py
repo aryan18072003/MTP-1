@@ -1,11 +1,4 @@
-"""
-Node Mapping
-Maps BioHopR instances to PrimeKG nodes, verifies coverage.
 
-Outputs (saved to src/results/):
-  - node_mapping_coverage.png
-  - node_mapping_summary.csv
-"""
 
 import matplotlib
 matplotlib.use("Agg")
@@ -20,14 +13,12 @@ sns.set_theme(style="whitegrid", font_scale=1.2)
 
 
 def build_kg_name_index(kg_df):
-    """Build a set of all unique entity names in PrimeKG, lowercased for matching."""
     x_names = set(kg_df["x_name"].dropna().str.lower().unique())
     y_names = set(kg_df["y_name"].dropna().str.lower().unique())
     return x_names | y_names
 
 
 def check_entity_coverage(benchmark_df, kg_names):
-    """Check what fraction of BioHopR entities exist in PrimeKG."""
     results = {}
 
     for col in ["hop1", "hop2"]:
@@ -37,7 +28,7 @@ def check_entity_coverage(benchmark_df, kg_names):
         results[col] = {"total": total, "found": found, "pct": found / total * 100 if total > 0 else 0}
         print(f"  {col}: {found}/{total} ({results[col]['pct']:.1f}%) found in PrimeKG")
 
-    # Check answer entities
+
     all_answers = []
     for answers in benchmark_df["answer"]:
         if isinstance(answers, (list, np.ndarray)):
@@ -55,11 +46,6 @@ def check_entity_coverage(benchmark_df, kg_names):
 
 
 def build_mapping_table(benchmark_df, kg_df):
-    """
-    Build a mapping table linking BioHopR instances to KG node indices.
-    BioHopR already has hop1_type, hop2_type, target_type — we verify and enrich.
-    """
-    # Build name → index lookup from KG
     x_lookup = kg_df[["x_name", "x_index", "x_type"]].drop_duplicates(subset="x_name")
     x_lookup.columns = ["name", "kg_index", "kg_type"]
     y_lookup = kg_df[["y_name", "y_index", "y_type"]].drop_duplicates(subset="y_name")
@@ -95,11 +81,9 @@ def build_mapping_table(benchmark_df, kg_df):
 
 
 def plot_coverage(coverage_results, mapping_df):
-    """Plot coverage statistics."""
-    # ── Coverage bar chart ───────────────────────────────────────────────
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
-    # Left: Entity coverage
+
     ax = axes[0]
     entities = list(coverage_results.keys())
     pcts = [coverage_results[e]["pct"] for e in entities]
@@ -114,19 +98,19 @@ def plot_coverage(coverage_results, mapping_df):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
                 f"{pct:.1f}%\n({total:,})", ha="center", va="bottom", fontsize=9)
 
-    # Right: Mapping completeness
+
     ax = axes[1]
     hop1_mapped = mapping_df["hop1_kg_index"].notna().sum()
     hop2_mapped = mapping_df["hop2_kg_index"].notna().sum()
     hop2_total = mapping_df["hop2"].notna().sum()
     total = len(mapping_df)
 
-    labels = ["Hop 1 → KG", "Hop 2 → KG"]
+    labels = ["Hop 1 -> KG", "Hop 2 -> KG"]
     mapped_pcts = [hop1_mapped / total * 100, hop2_mapped / hop2_total * 100 if hop2_total > 0 else 0]
     colors2 = sns.color_palette("Blues_d", 2)
     bars = ax.bar(labels, mapped_pcts, color=colors2, edgecolor="gray", linewidth=0.5)
     ax.set_ylabel("Mapping Rate (%)")
-    ax.set_title("BioHopR → PrimeKG Node Mapping", fontweight="bold")
+    ax.set_title("BioHopR -> PrimeKG Node Mapping", fontweight="bold")
     ax.set_ylim(0, 110)
     for bar, pct in zip(bars, mapped_pcts):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
@@ -135,7 +119,7 @@ def plot_coverage(coverage_results, mapping_df):
     plt.tight_layout()
     plt.savefig(os.path.join(RESULTS_DIR, "node_mapping_coverage.png"), dpi=150)
     plt.close()
-    print("  ✓ Saved node_mapping_coverage.png")
+    print("  Saved node_mapping_coverage.png")
 
 
 if __name__ == "__main__":
@@ -158,7 +142,7 @@ if __name__ == "__main__":
     mapping_df = build_mapping_table(benchmark_df, kg_df)
     mapping_path = os.path.join(RESULTS_DIR, "node_mapping_summary.csv")
     mapping_df.to_csv(mapping_path, index=False)
-    print(f"  ✓ Saved node_mapping_summary.csv ({len(mapping_df):,} rows)")
+    print(f"  Saved node_mapping_summary.csv ({len(mapping_df):,} rows)")
 
     print(f"\nMapping statistics:")
     print(f"  Hop 1 mapped to KG: {mapping_df['hop1_kg_index'].notna().sum():,} / {len(mapping_df):,}")
@@ -168,4 +152,4 @@ if __name__ == "__main__":
     print("\nGenerating plots...")
     plot_coverage(coverage, mapping_df)
 
-    print("\n✅ Step 2 complete — mapping saved to results/")
+    print("\n Step 2 complete - mapping saved to results/")

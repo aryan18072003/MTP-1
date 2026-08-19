@@ -1,7 +1,3 @@
-"""
-BioHopR Quick Test — Single sample evaluation.
-Uses shared utilities from utils.py.
-"""
 
 from utils import (
     setup_device, authenticate_hf, load_kg, load_biohopr,
@@ -21,7 +17,7 @@ if __name__ == "__main__":
     llm_pipe = load_llm(device)
     embedder = load_embedder(device)
 
-    # Print columns for reference
+
     print(f"\nDataset columns: {list(benchmark_df.columns)}")
 
     sample_row = benchmark_df.iloc[0]
