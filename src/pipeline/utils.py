@@ -9,13 +9,29 @@ from huggingface_hub import login
 SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 HF_TOKEN = "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"
-MODEL_NAME = "meta-llama/Llama-3.2-3B-Instruct"
 EMBEDDER_NAME = "FremyCompany/BioLORD-2023-C"
 KG_CSV_PATH = os.path.join(SRC_DIR, "data", "kg.csv")
 KG_PARQUET_PATH = os.path.join(SRC_DIR, "data", "kg.parquet")
 RESULTS_DIR = os.path.join(SRC_DIR, "results")
-EVAL_RESULTS_PATH = os.path.join(RESULTS_DIR, "evaluation_results.csv")
 COSINE_THRESHOLD = 0.9
+
+def get_dataset_dir(dataset_name):
+    # e.g., "knowlab-research/BioHopR" -> "BioHopR"
+    short_name = dataset_name.split("/")[-1]
+    path = os.path.join(RESULTS_DIR, short_name)
+    os.makedirs(path, exist_ok=True)
+    return path
+
+def get_model_dir(dataset_name, model_name):
+    # e.g., "meta-llama/Llama-3.2-3B-Instruct" -> "Llama-3.2-3B-Instruct"
+    d_path = get_dataset_dir(dataset_name)
+    m_name = model_name.split("/")[-1]
+    path = os.path.join(d_path, m_name)
+    os.makedirs(path, exist_ok=True)
+    return path
+
+def get_eval_results_path(dataset_name, model_name):
+    return os.path.join(get_model_dir(dataset_name, model_name), "evaluation_results.csv")
 
 BIOHOPR_NODE_TYPES = ["drug", "disease", "gene/protein", "effect/phenotype"]
 
@@ -43,21 +59,21 @@ def load_kg():
     return kg_df
 
 
-def load_biohopr():
-    print("Loading BioHopR benchmark dataset...")
-    biohopr = load_dataset("knowlab-research/BioHopR")
+def load_biohopr(dataset_name="knowlab-research/BioHopR"):
+    print(f"Loading {dataset_name} benchmark dataset...")
+    biohopr = load_dataset(dataset_name)
     benchmark_df = biohopr["train"].to_pandas()
     print(f"Benchmark loaded: {benchmark_df.shape[0]:,} samples")
     return benchmark_df
 
 
-def load_llm(device):
+def load_llm(device, model_name="meta-llama/Llama-3.2-3B-Instruct"):
     from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 
-    print(f"Loading tokenizer and model: {MODEL_NAME}...")
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    print(f"Loading tokenizer and model: {model_name}...")
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME,
+        model_name,
         dtype=torch.bfloat16 if device == "cuda" else torch.float16,
         device_map="auto" if device == "cuda" else None,
         low_cpu_mem_usage=True,
@@ -113,3 +129,4 @@ def evaluate_instance(embedder, prediction: str, targets, threshold: float = COS
 
 def ensure_results_dir():
     os.makedirs(RESULTS_DIR, exist_ok=True)
+    os.makedirs(os.path.join(RESULTS_DIR, "PrimeKG"), exist_ok=True)

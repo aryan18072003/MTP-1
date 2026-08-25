@@ -5,16 +5,22 @@ from utils import (
     generate_answer, evaluate_instance,
 )
 import numpy as np
+import argparse
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default="knowlab-research/BioHopR")
+    parser.add_argument("--model", type=str, default="meta-llama/Llama-3.2-3B-Instruct")
+    args = parser.parse_args()
+
     authenticate_hf()
     device = setup_device()
 
     kg_df = load_kg()
-    benchmark_df = load_biohopr()
+    benchmark_df = load_biohopr(args.dataset)
 
-    llm_pipe = load_llm(device)
+    llm_pipe = load_llm(device, args.model)
     embedder = load_embedder(device)
 
 

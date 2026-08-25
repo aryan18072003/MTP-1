@@ -5,24 +5,26 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 import os
-from utils import ensure_results_dir, RESULTS_DIR, EVAL_RESULTS_PATH
+import argparse
+from utils import ensure_results_dir, get_eval_results_path, get_model_dir
 
 
 sns.set_theme(style="white", font_scale=1.1)
 
 
-def load_evaluation_results():
-    if not os.path.exists(EVAL_RESULTS_PATH):
+def load_evaluation_results(dataset_name, model_name):
+    eval_path = get_eval_results_path(dataset_name, model_name)
+    if not os.path.exists(eval_path):
         raise FileNotFoundError(
-            f"Evaluation results not found at {EVAL_RESULTS_PATH}.\n"
+            f"Evaluation results not found at {eval_path}.\n"
             "Run evaluate_llm.py first."
         )
-    df = pd.read_csv(EVAL_RESULTS_PATH)
+    df = pd.read_csv(eval_path)
     print(f"Loaded {len(df):,} evaluation results")
     return df
 
 
-def create_heatmap(pivot_acc, pivot_count, title, filename, figsize=(10, 7)):
+def create_heatmap(pivot_acc, pivot_count, title, filename, dataset_name, model_name, figsize=(10, 7)):
     annot = pivot_acc.copy().astype(str)
     for i in pivot_acc.index:
         for j in pivot_acc.columns:
@@ -61,13 +63,14 @@ def create_heatmap(pivot_acc, pivot_count, title, filename, figsize=(10, 7)):
     plt.setp(ax.get_yticklabels(), rotation=0)
 
     plt.tight_layout()
-    filepath = os.path.join(RESULTS_DIR, filename)
+    out_dir = get_model_dir(dataset_name, model_name)
+    filepath = os.path.join(out_dir, filename)
     plt.savefig(filepath, dpi=200, bbox_inches="tight")
     plt.close()
     print(f"  Saved {filename}")
 
 
-def generate_overall_footprint(results_df):
+def generate_overall_footprint(results_df, dataset_name, model_name):
     print("\n" + "=" * 60)
     print("OVERALL KNOWLEDGE FOOTPRINT")
     print("=" * 60)
@@ -100,10 +103,13 @@ def generate_overall_footprint(results_df):
     acc_pivot = combined_df.groupby(["source_type", "target_type"])["correct"].mean().unstack(fill_value=0) * 100
     count_pivot = combined_df.groupby(["source_type", "target_type"]).size().unstack(fill_value=0)
 
+    model_short = model_name.split("/")[-1]
+    dataset_short = dataset_name.split("/")[-1]
     create_heatmap(
         acc_pivot, count_pivot,
-        "Knowledge Footprint -- LLM Accuracy\n(Llama-3.2-3B on BioHopR / PrimeKG)",
+        f"Knowledge Footprint -- LLM Accuracy\n({model_short} on {dataset_short} / PrimeKG)",
         "knowledge_footprint_overall.png",
+        dataset_name=dataset_name, model_name=model_name
     )
 
     print("\nAccuracy by (Source Type -> Target Type):")
@@ -116,7 +122,7 @@ def generate_overall_footprint(results_df):
     return combined_df
 
 
-def generate_hop_footprints(results_df):
+def generate_hop_footprints(results_df, dataset_name, model_name):
     print("\n" + "=" * 60)
     print("1-HOP & 2-HOP KNOWLEDGE FOOTPRINTS")
     print("=" * 60)
@@ -136,10 +142,13 @@ def generate_hop_footprints(results_df):
         acc_pivot = subset.groupby(["hop1_type", "target_type"])[correct_col].mean().unstack(fill_value=0) * 100
         count_pivot = subset.groupby(["hop1_type", "target_type"]).size().unstack(fill_value=0)
 
+        model_short = model_name.split("/")[-1]
+        dataset_short = dataset_name.split("/")[-1]
         create_heatmap(
             acc_pivot, count_pivot,
-            f"Knowledge Footprint -- {hop_label} Accuracy\n(Llama-3.2-3B on BioHopR / PrimeKG)",
+            f"Knowledge Footprint -- {hop_label} Accuracy\n({model_short} on {dataset_short} / PrimeKG)",
             filename,
+            dataset_name=dataset_name, model_name=model_name
         )
 
         total_acc = subset[correct_col].mean() * 100
@@ -150,7 +159,7 @@ def generate_hop_footprints(results_df):
         print(f"  Mean similarity: {mean_sim:.3f}")
 
 
-def generate_relation_footprint(results_df):
+def generate_relation_footprint(results_df, dataset_name, model_name):
     print("\n" + "=" * 60)
     print("KNOWLEDGE FOOTPRINT BY RELATION TYPE")
     print("=" * 60)
@@ -175,10 +184,11 @@ def generate_relation_footprint(results_df):
         "Knowledge Footprint by Relation Type\n(Top 10 Relations -- 1-Hop Accuracy)",
         "knowledge_footprint_by_relation.png",
         figsize=(12, 8),
+        dataset_name=dataset_name, model_name=model_name
     )
 
 
-def generate_summary_dashboard(results_df):
+def generate_summary_dashboard(results_df, dataset_name, model_name):
     print("\n" + "=" * 60)
     print("SUMMARY DASHBOARD")
     print("=" * 60)
@@ -251,23 +261,31 @@ def generate_summary_dashboard(results_df):
     ax.set_title("Performance Drop: 1-Hop -> 2-Hop", fontweight="bold")
     ax.axvline(x=0, color="black", linewidth=0.5)
 
-    plt.suptitle("Knowledge Footprint Dashboard -- Llama-3.2-3B on BioHopR",
+    model_short = model_name.split("/")[-1]
+    dataset_short = dataset_name.split("/")[-1]
+    plt.suptitle(f"Knowledge Footprint Dashboard -- {model_short} on {dataset_short}",
                  fontsize=15, fontweight="bold", y=1.01)
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "knowledge_footprint_dashboard.png"),
+    out_dir = get_model_dir(dataset_name, model_name)
+    plt.savefig(os.path.join(out_dir, "knowledge_footprint_dashboard.png"),
                 dpi=200, bbox_inches="tight")
     plt.close()
     print("  Saved knowledge_footprint_dashboard.png")
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default="knowlab-research/BioHopR")
+    parser.add_argument("--model", type=str, default="meta-llama/Llama-3.2-3B-Instruct")
+    args = parser.parse_args()
+
     ensure_results_dir()
 
-    results_df = load_evaluation_results()
+    results_df = load_evaluation_results(args.dataset, args.model)
 
-    combined_df = generate_overall_footprint(results_df)
-    generate_hop_footprints(results_df)
-    generate_relation_footprint(results_df)
-    generate_summary_dashboard(results_df)
+    combined_df = generate_overall_footprint(results_df, args.dataset, args.model)
+    generate_hop_footprints(results_df, args.dataset, args.model)
+    generate_relation_footprint(results_df, args.dataset, args.model)
+    generate_summary_dashboard(results_df, args.dataset, args.model)
 
     print("\n Step 4 complete")

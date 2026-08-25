@@ -11,7 +11,7 @@ from utils import (
     setup_device, authenticate_hf, load_biohopr,
     load_llm, load_embedder,
     generate_answer, evaluate_instance,
-    ensure_results_dir, RESULTS_DIR, EVAL_RESULTS_PATH,
+    ensure_results_dir, get_eval_results_path, get_model_dir
 )
 
 sns.set_theme(style="whitegrid", font_scale=1.2)
@@ -19,20 +19,22 @@ sns.set_theme(style="whitegrid", font_scale=1.2)
 CHECKPOINT_INTERVAL = 50
 
 
-def load_checkpoint():
-    if os.path.exists(EVAL_RESULTS_PATH):
-        df = pd.read_csv(EVAL_RESULTS_PATH)
+def load_checkpoint(dataset_name, model_name):
+    eval_path = get_eval_results_path(dataset_name, model_name)
+    if os.path.exists(eval_path):
+        df = pd.read_csv(eval_path)
         print(f"  Loaded checkpoint: {len(df)} samples already evaluated")
         return df
     return pd.DataFrame()
 
 
-def save_checkpoint(results_df):
-    results_df.to_csv(EVAL_RESULTS_PATH, index=False)
+def save_checkpoint(results_df, dataset_name, model_name):
+    eval_path = get_eval_results_path(dataset_name, model_name)
+    results_df.to_csv(eval_path, index=False)
 
 
-def evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=None):
-    existing_df = load_checkpoint()
+def evaluate_all(benchmark_df, llm_pipe, embedder, dataset_name, model_name, max_samples=None):
+    existing_df = load_checkpoint(dataset_name, model_name)
     completed_indices = set(existing_df["sample_idx"].tolist()) if len(existing_df) > 0 else set()
 
     total_samples = len(benchmark_df)
@@ -110,16 +112,16 @@ def evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=None):
                   f"({rate:.1f} samples/s, ~{remaining / 60:.0f}m remaining)")
 
         if new_count % CHECKPOINT_INTERVAL == 0:
-            save_checkpoint(pd.DataFrame(results))
+            save_checkpoint(pd.DataFrame(results), dataset_name, model_name)
             print(f"  Checkpoint saved ({len(results)} total results)")
 
     results_df = pd.DataFrame(results)
-    save_checkpoint(results_df)
+    save_checkpoint(results_df, dataset_name, model_name)
     print(f"\n  Evaluation complete: {len(results_df)} total results")
     return results_df
 
 
-def plot_evaluation_summary(results_df):
+def plot_evaluation_summary(results_df, dataset_name, model_name):
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
     ax = axes[0]
@@ -170,7 +172,8 @@ def plot_evaluation_summary(results_df):
     plt.suptitle(f"LLM Evaluation Summary (n={len(results_df):,})",
                  fontsize=14, fontweight="bold", y=1.02)
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "evaluation_summary.png"),
+    out_dir = get_model_dir(dataset_name, model_name)
+    plt.savefig(os.path.join(out_dir, "evaluation_summary.png"),
                 dpi=150, bbox_inches="tight")
     plt.close()
     print("  Saved evaluation_summary.png")
@@ -199,7 +202,7 @@ def plot_evaluation_summary(results_df):
         ax.set_ylabel("Hop 1 Type")
 
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "accuracy_by_node_type.png"), dpi=150)
+    plt.savefig(os.path.join(out_dir, "accuracy_by_node_type.png"), dpi=150)
     plt.close()
     print("  Saved accuracy_by_node_type.png")
 
@@ -208,20 +211,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate LLM on BioHopR")
     parser.add_argument("--max-samples", type=int, default=None,
                         help="Max samples to evaluate (default: all)")
+    parser.add_argument("--dataset", type=str, default="knowlab-research/BioHopR",
+                        help="Dataset to use")
+    parser.add_argument("--model", type=str, default="meta-llama/Llama-3.2-3B-Instruct",
+                        help="LLM model to use")
     args = parser.parse_args()
 
     ensure_results_dir()
     device = setup_device()
     authenticate_hf()
 
-    benchmark_df = load_biohopr()
-    llm_pipe = load_llm(device)
+    benchmark_df = load_biohopr(args.dataset)
+    llm_pipe = load_llm(device, args.model)
     embedder = load_embedder(device)
 
-    results_df = evaluate_all(benchmark_df, llm_pipe, embedder, max_samples=args.max_samples)
+    results_df = evaluate_all(benchmark_df, llm_pipe, embedder, args.dataset, args.model, max_samples=args.max_samples)
 
     print("\nGenerating plots...")
-    plot_evaluation_summary(results_df)
+    plot_evaluation_summary(results_df, args.dataset, args.model)
 
     hop1_mask = results_df["hop1_question"].astype(str).str.len() > 0
     hop2_mask = results_df["hop2_question"].astype(str).str.len() > 0

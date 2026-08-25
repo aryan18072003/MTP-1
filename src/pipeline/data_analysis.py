@@ -6,8 +6,9 @@ import matplotlib.ticker as ticker
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from utils import load_kg, load_biohopr, ensure_results_dir, RESULTS_DIR
+from utils import load_kg, load_biohopr, ensure_results_dir, RESULTS_DIR, get_dataset_dir
 import os
+import argparse
 
 sns.set_theme(style="whitegrid", font_scale=1.2)
 PALETTE = sns.color_palette("viridis", 12)
@@ -43,7 +44,8 @@ def analyze_kg(kg_df):
                 bar.get_y() + bar.get_height() / 2,
                 f"{val:,}", va="center", fontsize=9)
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "kg_node_type_distribution.png"), dpi=150)
+    kg_dir = os.path.join(RESULTS_DIR, "PrimeKG")
+    plt.savefig(os.path.join(kg_dir, "kg_node_type_distribution.png"), dpi=150)
     plt.close()
     print("  Saved kg_node_type_distribution.png")
 
@@ -70,7 +72,7 @@ def analyze_kg(kg_df):
                 bar.get_y() + bar.get_height() / 2,
                 f"{val:,}", va="center", fontsize=8)
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "kg_relation_type_distribution.png"), dpi=150)
+    plt.savefig(os.path.join(kg_dir, "kg_relation_type_distribution.png"), dpi=150)
     plt.close()
     print("  Saved kg_relation_type_distribution.png")
 
@@ -88,9 +90,9 @@ def analyze_kg(kg_df):
     return all_node_types, relation_counts
 
 
-def analyze_biohopr(benchmark_df):
+def analyze_biohopr(benchmark_df, dataset_name):
     print("\n" + "=" * 60)
-    print("BIOHOPR ANALYSIS")
+    print(f"{dataset_name.split('/')[-1].upper()} ANALYSIS")
     print("=" * 60)
 
     print(f"\nColumns: {list(benchmark_df.columns)}")
@@ -128,12 +130,15 @@ def analyze_biohopr(benchmark_df):
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 20,
                     str(val), ha="center", va="bottom", fontsize=9)
 
-    plt.suptitle("BioHopR - Node Type Distributions", fontsize=14, fontweight="bold", y=1.02)
+    dataset_short = dataset_name.split("/")[-1]
+    plt.suptitle(f"{dataset_short} - Node Type Distributions", fontsize=14, fontweight="bold", y=1.02)
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "biohopr_hop_type_distribution.png"),
+    
+    out_dir = get_dataset_dir(dataset_name)
+    plt.savefig(os.path.join(out_dir, f"{dataset_short.lower()}_hop_type_distribution.png"),
                 dpi=150, bbox_inches="tight")
     plt.close()
-    print("  Saved biohopr_hop_type_distribution.png")
+    print(f"  Saved {dataset_short.lower()}_hop_type_distribution.png")
 
     combo_counts = benchmark_df.groupby(["hop1_type", "target_type"]).size().unstack(fill_value=0)
 
@@ -150,12 +155,12 @@ def analyze_biohopr(benchmark_df):
     )
     ax.set_xlabel("Target Node Type", fontweight="bold")
     ax.set_ylabel("Hop 1 Node Type", fontweight="bold")
-    ax.set_title("BioHopR - Sample Counts by (Hop1 Type -> Target Type)",
+    ax.set_title(f"{dataset_short} - Sample Counts by (Hop1 Type -> Target Type)",
                  fontsize=13, fontweight="bold")
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "biohopr_sample_counts.png"), dpi=150)
+    plt.savefig(os.path.join(out_dir, f"{dataset_short.lower()}_sample_counts.png"), dpi=150)
     plt.close()
-    print("  Saved biohopr_sample_counts.png")
+    print(f"  Saved {dataset_short.lower()}_sample_counts.png")
 
     print("\nrelation_hop1 distribution:")
     print(benchmark_df["relation_hop1"].value_counts().to_string())
@@ -179,9 +184,13 @@ def analyze_biohopr(benchmark_df):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default="knowlab-research/BioHopR")
+    args = parser.parse_args()
+
     ensure_results_dir()
     kg_df = load_kg()
-    benchmark_df = load_biohopr()
+    benchmark_df = load_biohopr(args.dataset)
     analyze_kg(kg_df)
-    analyze_biohopr(benchmark_df)
+    analyze_biohopr(benchmark_df, args.dataset)
     print("\n Step 1 complete - all plots saved to results/")

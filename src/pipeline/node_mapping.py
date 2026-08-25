@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from utils import load_kg, load_biohopr, ensure_results_dir, RESULTS_DIR
+from utils import load_kg, load_biohopr, ensure_results_dir, RESULTS_DIR, get_dataset_dir
 import os
+import argparse
 
 sns.set_theme(style="whitegrid", font_scale=1.2)
 
@@ -80,7 +81,8 @@ def build_mapping_table(benchmark_df, kg_df):
     return mapping_df
 
 
-def plot_coverage(coverage_results, mapping_df):
+def plot_coverage(coverage_results, mapping_df, dataset_name):
+    dataset_short = dataset_name.split("/")[-1]
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
 
@@ -92,7 +94,7 @@ def plot_coverage(coverage_results, mapping_df):
 
     bars = ax.bar(entities, pcts, color=colors, edgecolor="gray", linewidth=0.5)
     ax.set_ylabel("Coverage (%)")
-    ax.set_title("BioHopR Entity Coverage in PrimeKG", fontweight="bold")
+    ax.set_title(f"{dataset_short} Entity Coverage in PrimeKG", fontweight="bold")
     ax.set_ylim(0, 110)
     for bar, pct, total in zip(bars, pcts, totals):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
@@ -110,24 +112,29 @@ def plot_coverage(coverage_results, mapping_df):
     colors2 = sns.color_palette("Blues_d", 2)
     bars = ax.bar(labels, mapped_pcts, color=colors2, edgecolor="gray", linewidth=0.5)
     ax.set_ylabel("Mapping Rate (%)")
-    ax.set_title("BioHopR -> PrimeKG Node Mapping", fontweight="bold")
+    ax.set_title(f"{dataset_short} -> PrimeKG Node Mapping", fontweight="bold")
     ax.set_ylim(0, 110)
     for bar, pct in zip(bars, mapped_pcts):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
                 f"{pct:.1f}%", ha="center", va="bottom", fontsize=10)
 
     plt.tight_layout()
-    plt.savefig(os.path.join(RESULTS_DIR, "node_mapping_coverage.png"), dpi=150)
+    out_dir = get_dataset_dir(dataset_name)
+    plt.savefig(os.path.join(out_dir, "node_mapping_coverage.png"), dpi=150)
     plt.close()
     print("  Saved node_mapping_coverage.png")
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default="knowlab-research/BioHopR")
+    args = parser.parse_args()
+
     ensure_results_dir()
 
     print("Loading data...")
     kg_df = load_kg()
-    benchmark_df = load_biohopr()
+    benchmark_df = load_biohopr(args.dataset)
 
     print("\n" + "=" * 60)
     print("ENTITY COVERAGE CHECK")
@@ -140,7 +147,8 @@ if __name__ == "__main__":
     print("BUILDING NODE MAPPING TABLE")
     print("=" * 60)
     mapping_df = build_mapping_table(benchmark_df, kg_df)
-    mapping_path = os.path.join(RESULTS_DIR, "node_mapping_summary.csv")
+    out_dir = get_dataset_dir(args.dataset)
+    mapping_path = os.path.join(out_dir, "node_mapping_summary.csv")
     mapping_df.to_csv(mapping_path, index=False)
     print(f"  Saved node_mapping_summary.csv ({len(mapping_df):,} rows)")
 
@@ -150,6 +158,6 @@ if __name__ == "__main__":
     print(f"  Hop 2 mapped to KG: {mapping_df['hop2_kg_index'].notna().sum():,} / {hop2_total:,}")
 
     print("\nGenerating plots...")
-    plot_coverage(coverage, mapping_df)
+    plot_coverage(coverage, mapping_df, args.dataset)
 
     print("\n Step 2 complete - mapping saved to results/")
