@@ -2,6 +2,7 @@
 import ast
 import hashlib
 import json
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -44,19 +45,42 @@ def write_json(path, value):
     temporary.replace(path)
 
 
-def download(url, path):
-    """Cache a public source atomically and record its content hash and URL."""
+def download(url, path, *, max_attempts=5):
+    """Cache a complete source, retrying transient failures including body reads.
+
+    Each attempt starts a fresh .part file: never append a restarted HTTP body to
+    incomplete bytes, or publish a failed transfer as a valid cached source.
+    Completed cached files and their existing provenance are left unchanged.
+    """
+    if max_attempts < 1:
+        raise ValueError('max_attempts must be positive')
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
         print(f'Downloading {path.name}...', flush=True)
         temporary = path.with_suffix(path.suffix + '.part')
-        with requests.get(url, stream=True, timeout=(20, 120)) as response:
-            response.raise_for_status()
-            with temporary.open('wb') as stream:
-                for chunk in response.iter_content(1024 * 1024):
-                    stream.write(chunk)
-        temporary.replace(path)
+        for attempt in range(1, max_attempts + 1):
+            try:
+                with requests.get(url, stream=True, timeout=(20, 120)) as response:
+                    response.raise_for_status()
+                    with temporary.open('wb') as stream:
+                        for chunk in response.iter_content(1024 * 1024):
+                            stream.write(chunk)
+                temporary.replace(path)
+                break
+            except requests.exceptions.RequestException as error:
+                retryable = isinstance(error, (
+                    requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+                    requests.exceptions.ChunkedEncodingError, requests.exceptions.ContentDecodingError))
+                if isinstance(error, requests.exceptions.HTTPError):
+                    status = error.response.status_code if error.response is not None else None
+                    retryable = status in {408, 429, 500, 502, 503, 504}
+                if not retryable or attempt == max_attempts:
+                    raise
+                delay = min(2 ** attempt, 30)
+                print(f'{path.name}: {type(error).__name__} on attempt '
+                      f'{attempt}/{max_attempts}; restarting download in {delay}s...', flush=True)
+                time.sleep(delay)
     metadata_path = path.with_suffix(path.suffix + '.source.json')
     digest = sha256_file(path)
     if metadata_path.exists():

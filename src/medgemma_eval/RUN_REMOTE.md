@@ -33,6 +33,8 @@ scp src/data/kg.parquet your-user@your-server:/home/your-user/MTP-1/src/data/
 
 Use `kg.csv` in the last command if that is the available PrimeKG file. Hetionet, DRKG, BioKG, their label tables, and the public BioHopR release download automatically when needed. Graphs and label tables are cached in `src/data/knowledge_graphs/`; copying an existing cache is optional. MedGemma and BioLORD use the Hugging Face cache. Allow space for the original model download even when inference uses 4-bit weights, plus graph downloads, extracted files and experiment outputs. Graph preparation needs CPU RAM independently of GPU memory; it loads one graph at a time.
 
+Interrupted HTTP downloads, including UniProt's `ChunkedEncodingError: Response ended prematurely`, retry up to five attempts with increasing delays. Each attempt restarts the incomplete file; only completed downloads enter the cache. If preparation still exits, repeat the same prepare command. Completed source downloads are reused, while evidence preparation is recomputed. To get this retry behavior on an older server copy, transfer the updated `src/kg_eval/utils.py` first. No package reinstall is needed for this change.
+
 **2. Create the environment and authenticate.**
 
 On the Linux server:
