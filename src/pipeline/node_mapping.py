@@ -1,12 +1,10 @@
-
-
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from utils import load_kg, load_biohopr, ensure_results_dir, RESULTS_DIR, get_dataset_dir
+from utils import load_kg, load_benchmark, ensure_results_dir, get_dataset_dir
 import os
 import argparse
 
@@ -134,7 +132,7 @@ if __name__ == "__main__":
 
     print("Loading data...")
     kg_df = load_kg()
-    benchmark_df = load_biohopr(args.dataset)
+    benchmark_df = load_benchmark(args.dataset)
 
     print("\n" + "=" * 60)
     print("ENTITY COVERAGE CHECK")

@@ -1,0 +1,144 @@
+{
+  "completed_at": "2026-09-07T13:49:23.971297+00:00",
+  "protocol": {
+    "version": "3.0",
+    "task": "relation-aware biomedical retrieval",
+    "one_hop": "hop1 -> target_type",
+    "two_hop": "hop2 -> any node of hop1_type -> target_type",
+    "edge_predicates": "semantic mode enforces positive treatment, phenotype and side-effect edges; other associations pooled by type",
+    "direction": "traverse relations or their inverses according to requested endpoint types",
+    "matching": "casefolded preferred names with whitespace normalization; no fuzzy matching",
+    "ambiguous_start_names": "union of matching IDs, count reported; intermediate IDs never merged",
+    "answer_unit": "unique normalized preferred name; unlabelled IDs count as unmatched candidates",
+    "missing_question_or_fields_or_targets": "excluded, with explicit status",
+    "missing_nodes_or_unsupported_paths": "scored as zero; coverage and supported-only metrics also reported",
+    "aggregation": "macro average over applicable benchmark rows separately for each hop",
+    "interpretation": "agreement with released reference answers, not exhaustive biomedical truth or LLM accuracy"
+  },
+  "graph": {
+    "name": "PrimeKG",
+    "sources": [
+      {
+        "file": "C:\\Users\\mukta\\OneDrive\\Desktop\\MTP-1\\src\\data\\kg.parquet",
+        "sha256": "fbe3ef8813e2b9bbe79919257f99751e1bae1f5c8a6d0829ecd47aeffd89175d"
+      }
+    ],
+    "notes": [
+      "Local PrimeKG snapshot, restricted to BioHopR's four node types.",
+      "Benchmark is derived from PrimeKG; this is an in-source retrieval baseline.",
+      "Semantic mode excludes contraindications and negative phenotype annotations; indication and off-label use are treatment edges."
+    ],
+    "supported_constraints": [
+      "phenotype",
+      "side_effect",
+      "treatment"
+    ],
+    "node_count": 68019,
+    "node_types": {
+      "gene/protein": 27671,
+      "drug": 7957,
+      "effect/phenotype": 15311,
+      "disease": 17080
+    },
+    "unlabelled_nodes": 0,
+    "ambiguous_name_type_pairs": 1,
+    "adjacency_arcs": 4152066,
+    "input_edges": 8100498,
+    "retained_edge_rows": 4153276,
+    "edges_outside_projection": 3947222
+  },
+  "relation_policy": "semantic",
+  "environment": {
+    "python": "3.12.5",
+    "pandas": "2.2.2",
+    "numpy": "2.1.0",
+    "requests": "2.32.3",
+    "pyarrow": "23.0.1"
+  },
+  "benchmark_checks": {
+    "1": {
+      "unique_question_texts": 2494,
+      "questions_with_differing_answer_sets": 107
+    },
+    "2": {
+      "unique_question_texts": 7633,
+      "questions_with_differing_answer_sets": 0
+    }
+  },
+  "benchmark": {
+    "dataset": "knowlab-research/BioHopR",
+    "split": "train",
+    "revision": "08f06692c3900347e7405ba55ff6a6d330f55ddb",
+    "sha256": "1adda2f23d305c394537e7b56d3e972b2d8f4141ae716ede54e0d08876eb527d",
+    "url": "https://huggingface.co/datasets/knowlab-research/BioHopR/resolve/08f06692c3900347e7405ba55ff6a6d330f55ddb/BioHopR.json"
+  },
+  "n_available_samples": 7633,
+  "n_evaluated_samples": 7633,
+  "requested_max_samples": null,
+  "scope": "full",
+  "hops": {
+    "1": {
+      "n_rows": 7633,
+      "n_evaluated": 7633,
+      "n_excluded": 0,
+      "status_counts": {
+        "ok": 7633
+      },
+      "n_supported": 7633,
+      "n_start_found": 7633,
+      "n_ambiguous_starts": 0,
+      "start_coverage": 1.0,
+      "hit_rate": 0.9986898991222324,
+      "recall": 0.9513987917868639,
+      "precision": 0.9598050866065677,
+      "f1": 0.9372119020271802,
+      "mean_predictions": 28.979169396043496,
+      "supported_only_hit_rate": 0.9986898991222324,
+      "start_found_only_hit_rate": 0.9986898991222324,
+      "n_unique_question_answer_pairs": 2753,
+      "unique_pair_hit_rate": 0.9970940791863422
+    },
+    "2": {
+      "n_rows": 7633,
+      "n_evaluated": 7633,
+      "n_excluded": 0,
+      "status_counts": {
+        "ok": 7633
+      },
+      "n_supported": 7633,
+      "n_start_found": 7633,
+      "n_ambiguous_starts": 0,
+      "start_coverage": 1.0,
+      "hit_rate": 0.9986898991222324,
+      "recall": 0.9952917734352812,
+      "precision": 0.9267571918694284,
+      "f1": 0.944495940931316,
+      "mean_predictions": 41.016376260972095,
+      "supported_only_hit_rate": 0.9986898991222324,
+      "start_found_only_hit_rate": 0.9986898991222324,
+      "n_unique_question_answer_pairs": 7633,
+      "unique_pair_hit_rate": 0.9986898991222324
+    }
+  },
+  "code_sha256": {
+    "evaluate_kg.py": "46aa518dcde2f3e2a52683b714396865ce3c025360f5c47006bdc1f49a2ed305",
+    "kg_loader.py": "91a7a84251cde3c6d1cd63441c56b6a013b4469381949c2cc5505bfbb3dee41b",
+    "utils.py": "f831ae4ee477d3734cad1f9fbc211c2feb9aca2293248b914284c7267553db58",
+    "sources.py": "4578f319c1a945625123a7e4fc2fff7be14475b1725454b2b7c1210612b18ea1",
+    "visualize_kg.py": "de3454b68d57480a50fbbc8257ec96dea308287a183e91b7830f79c9336a719d"
+  },
+  "outputs": {
+    "metrics_by_type_path.csv": {
+      "sha256": "0dda405e8873e7f47b68c9bfd325c1f8a7b06df1f95cf54ee5c390622e1f39ce",
+      "bytes": 3165
+    },
+    "per_question_metrics.csv": {
+      "sha256": "8b7f8d9ed390458e64b4768025c390d0addef586d585639bf3add27be970b22a",
+      "bytes": 2868588
+    },
+    "plots\\retrieval_dashboard.png": {
+      "sha256": "f002371568d0a98c33b4451fcaf34fd2719149a9fa52a3a9de4c38705ba83298",
+      "bytes": 288250
+    }
+  }
+}

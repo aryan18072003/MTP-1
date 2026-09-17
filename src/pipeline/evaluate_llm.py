@@ -8,7 +8,7 @@ import argparse
 import time
 import os
 from utils import (
-    setup_device, authenticate_hf, load_biohopr,
+    setup_device, authenticate_hf, load_benchmark,
     load_llm, load_embedder,
     generate_answer, evaluate_instance,
     ensure_results_dir, get_eval_results_path, get_model_dir
@@ -38,7 +38,7 @@ def evaluate_all(benchmark_df, llm_pipe, embedder, dataset_name, model_name, max
     completed_indices = set(existing_df["sample_idx"].tolist()) if len(existing_df) > 0 else set()
 
     total_samples = len(benchmark_df)
-    if max_samples:
+    if max_samples is not None:
         total_samples = min(max_samples, total_samples)
 
     results = existing_df.to_dict("records") if len(existing_df) > 0 else []
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     device = setup_device()
     authenticate_hf()
 
-    benchmark_df = load_biohopr(args.dataset)
+    benchmark_df = load_benchmark(args.dataset)
     llm_pipe = load_llm(device, args.model)
     embedder = load_embedder(device)
 

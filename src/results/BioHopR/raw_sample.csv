@@ -1,0 +1,125 @@
+relation_hop1,relation_hop2,hop1,hop1_type,hop2,hop2_type,target_type,answer,system,prompt,hop1_question,hop2_question,hop1_question_multi,hop2_question_multi
+effect/phenotype:disease,drug:effect/phenotype:disease,Pain,effect/phenotype,Benzyl benzoate,drug,disease,"['very long chain acyl-CoA dehydrogenase deficiency' 'POEMS syndrome'
+ 'retinal capillary malformation' 'oromandibular dystonia'
+ 'amyotrophic lateral sclerosis' 'systemic sclerosis'
+ 'postpoliomyelitis syndrome' 'familial focal epilepsy with variable foci'
+ 'interstitial cystitis' 'acatalasia'
+ 'chromosome 17q11.2 deletion syndrome, 1.4Mb' 'scleroderma (disease)'
+ 'polycystic kidney disease' 'Parkes Weber syndrome'
+ 'intermediate Charcot-Marie-Tooth disease' 'fibular hemimelia'
+ 'paraparetic variant of Guillain-Barre syndrome'
+ 'obsolete rare circulatory system disease' 'subependymoma'
+ 'thyroid gland undifferentiated (anaplastic) carcinoma'
+ 'tufted angioma (disease)' 'hereditary spastic paraplegia'
+ 'familial papillary or follicular thyroid carcinoma'
+ 'snakebite envenomation' 'spinocerebellar ataxia'
+ 'epidermal nevus syndrome' 'ABeta2M amyloidosis'
+ 'thromboangiitis obliterans'
+ 'kyphoscoliosis-lateral tongue atrophy-hereditary spastic paraplegia syndrome'
+ 'hereditary painful callosities' 'primary hyperoxaluria'
+ 'metachromatic leukodystrophy'
+ 'Charcot-Marie-Tooth disease-deafness-intellectual disability syndrome'
+ 'leukocyte adhesion deficiency' 'optic atrophy' 'scorpion envenomation'
+ 'IgG4-related retroperitoneal fibrosis' 'ependymoma'
+ 'Charcot-Marie-Tooth disease' 'bone osteosarcoma' 'poliomyelitis'
+ 'schwannoma']",You are an expert biomedical researcher.,"Name a disease that is related to a effect/phenotype that is associated with drug Benzyl benzoate.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to effect/phenotype Pain.,Name a disease that is related to a effect/phenotype that is associated with drug Benzyl benzoate.,Name all diseases that are related to effect/phenotype Pain.,Name all diseases that are related to a effect/phenotype that is associated with drug Benzyl benzoate.
+effect/phenotype:disease,drug:effect/phenotype:disease,Blepharitis,effect/phenotype,Idoxuridine,drug,disease,"['Cornelia de Lange syndrome' 'chromosome 17q23.1-q23.2 deletion syndrome'
+ 'leukonychia totalis' 'lichen planus pemphigoides'
+ 'sea-blue histiocyte syndrome' 'dyskeratosis congenita'
+ 'keratoconjunctivitis' 'xeroderma pigmentosum' 'ectodermal dysplasia'
+ 'cutaneous porphyria'
+ 'multiple congenital anomalies-hypotonia-seizures syndrome'
+ 'Mobius syndrome' 'Clouston syndrome' 'candidiasis, familial'
+ 'IFAP syndrome with or without BRESHECK syndrome'
+ 'neonatal inflammatory skin and bowel disease' 'Wiskott-Aldrich syndrome'
+ 'limb-mammary syndrome' 'Olmsted syndrome'
+ 'poikiloderma with neutropenia' 'xanthogranuloma' 'EEC syndrome'
+ 'ectrodactyly, ectodermal dysplasia, and cleft lip-palate syndrome']",You are an expert biomedical researcher.,"Name a disease that is related to a effect/phenotype that is associated with drug Idoxuridine.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to effect/phenotype Blepharitis.,Name a disease that is related to a effect/phenotype that is associated with drug Idoxuridine.,Name all diseases that are related to effect/phenotype Blepharitis.,Name all diseases that are related to a effect/phenotype that is associated with drug Idoxuridine.
+effect/phenotype:disease,drug:effect/phenotype:disease,Anaphylactic shock,effect/phenotype,Vitamin A,drug,disease,['cystic echinococcosis' 'aggressive systemic mastocytosis'],You are an expert biomedical researcher.,"Name a disease that is related to a effect/phenotype that is associated with drug Vitamin A.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to effect/phenotype Anaphylactic shock.,Name a disease that is related to a effect/phenotype that is associated with drug Vitamin A.,Name all diseases that are related to effect/phenotype Anaphylactic shock.,Name all diseases that are related to a effect/phenotype that is associated with drug Vitamin A.
+effect/phenotype:disease,drug:effect/phenotype:disease,Decreased circulating copper concentration,effect/phenotype,Zinc chloride,drug,disease,['COG2-CDG' 'IRIDA syndrome' 'MEDNIK syndrome'],You are an expert biomedical researcher.,"Name a disease that is related to a effect/phenotype that is associated with drug Zinc chloride.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to effect/phenotype Decreased circulating copper concentration.,Name a disease that is related to a effect/phenotype that is associated with drug Zinc chloride.,Name all diseases that are related to effect/phenotype Decreased circulating copper concentration.,Name all diseases that are related to a effect/phenotype that is associated with drug Zinc chloride.
+effect/phenotype:disease,drug:effect/phenotype:disease,Nausea,effect/phenotype,Zinc sulfate,drug,disease,"['graft versus host disease' 'mercury poisoning' 'Fabry disease'
+ 'fructose intolerance' 'migraine, familial typical, susceptibility to, 2'
+ 'toxic shock syndrome' 'tick-borne encephalitis' 'urticaria'
+ 'hypervitaminosis a, susceptibility to'
+ 'acute disseminated encephalomyelitis'
+ 'multiple acyl-CoA dehydrogenase deficiency' 'choroid plexus papilloma'
+ 'SUNCT syndrome'
+ 'hypokalemic alkalosis, familial, with specific renal tubulopathy'
+ 'variegate porphyria' 'Ehlers-Danlos syndrome, classic type'
+ 'amoebiasis due to free-living amoebae'
+ 'anterior cutaneous nerve entrapment syndrome'
+ 'lysinuric protein intolerance' 'ovarian hyperstimulation syndrome'
+ 'human African trypanosomiasis'
+ 'mitochondrial neurogastrointestinal encephalomyopathy'
+ 'Parkinson disease' 'Turcot syndrome with polyposis' 'lead poisoning'
+ 'angiostrongyliasis' 'Zygomycosis' 'cyclic vomiting syndrome'
+ 'familial lipoprotein lipase deficiency']",You are an expert biomedical researcher.,"Name a disease that is related to a effect/phenotype that is associated with drug Zinc sulfate.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to effect/phenotype Nausea.,Name a disease that is related to a effect/phenotype that is associated with drug Zinc sulfate.,Name all diseases that are related to effect/phenotype Nausea.,Name all diseases that are related to a effect/phenotype that is associated with drug Zinc sulfate.
+gene/protein:disease,drug:gene/protein:disease,PTGS1,gene/protein,(+)-2-(4-biphenyl)propionic acid,drug,disease,"['carcinoma of esophagus' 'corpus luteum cyst' 'gastric ulcer (disease)'
+ 'hereditary breast ovarian cancer syndrome' 'ovarian cyst (disease)'
+ 'chronic renal failure syndrome' 'undifferentiated carcinoma'
+ 'intestinal polyp (disease)' 'heart failure' 'sarcomatoid carcinoma'
+ 'hereditary breast carcinoma' 'asthma' 'end stage renal failure'
+ 'platelet-type bleeding disorder' 'ischemia reperfusion injury'
+ 'breast cancer' 'undifferentiated carcinoma of the corpus uteri'
+ 'chronic kidney disease' 'esophageal cancer' 'breast neoplasm'
+ 'carcinoma' 'rheumatoid arthritis' 'schizophrenia' 'occupational asthma'
+ 'breast carcinoma' 'congestive heart failure'
+ 'squamous cell carcinoma of the corpus uteri']",You are an expert biomedical researcher.,"Name a disease that is related to a gene/protein that is associated with drug (+)-2-(4-biphenyl)propionic acid.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to gene/protein PTGS1.,Name a disease that is related to a gene/protein that is associated with drug (+)-2-(4-biphenyl)propionic acid.,Name all diseases that are related to gene/protein PTGS1.,Name all diseases that are related to a gene/protein that is associated with drug (+)-2-(4-biphenyl)propionic acid.
+gene/protein:disease,drug:gene/protein:disease,GAPDHS,gene/protein,(+)-Rutamarin alcohol,drug,disease,"['Alzheimer disease without neurofibrillary tangles'
+ 'Creutzfeldt Jacob disease' 'cerebellar degeneration' 'Alzheimer disease'
+ 'Pick disease' 'Reye syndrome']",You are an expert biomedical researcher.,"Name a disease that is related to a gene/protein that is associated with drug (+)-Rutamarin alcohol.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to gene/protein GAPDHS.,Name a disease that is related to a gene/protein that is associated with drug (+)-Rutamarin alcohol.,Name all diseases that are related to gene/protein GAPDHS.,Name all diseases that are related to a gene/protein that is associated with drug (+)-Rutamarin alcohol.
+gene/protein:disease,drug:gene/protein:disease,AHCY,gene/protein,"(1'R,2'S)-9-(2-Hydroxy-3'-Keto-Cyclopenten-1-yl)Adenine",drug,disease,"['glycine N-methyltransferase deficiency' 'non-alcoholic steatohepatitis'
+ 'inherited amino acid metabolic disorder' 'lung cancer'
+ 'lung adenocarcinoma' 'fatty liver disease' 'hereditary hemochromatosis'
+ 'hypermethioninemia with deficiency of S-adenosylhomocysteine hydrolase'
+ 'iron metabolism disease' 'Wilson disease'
+ 'methionine adenosyltransferase deficiency']",You are an expert biomedical researcher.,"Name a disease that is related to a gene/protein that is associated with drug (1'R,2'S)-9-(2-Hydroxy-3'-Keto-Cyclopenten-1-yl)Adenine.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to gene/protein AHCY.,"Name a disease that is related to a gene/protein that is associated with drug (1'R,2'S)-9-(2-Hydroxy-3'-Keto-Cyclopenten-1-yl)Adenine.",Name all diseases that are related to gene/protein AHCY.,"Name all diseases that are related to a gene/protein that is associated with drug (1'R,2'S)-9-(2-Hydroxy-3'-Keto-Cyclopenten-1-yl)Adenine."
+gene/protein:disease,drug:gene/protein:disease,ABCC2,gene/protein,"(1,10 Phenanthroline)-(Tri-Carbon Monoxide) Rhenium (I)",drug,disease,"['colorectal neoplasm' 'visual epilepsy' 'partial epilepsy'
+ 'esophageal squamous cell carcinoma' 'hyperbilirubinemia'
+ 'pseudopelade of Brocq' 'cholestasis' 'partial motor epilepsy'
+ 'Gilbert syndrome' 'status epilepticus' 'Dubin-Johnson syndrome'
+ 'androgenetic alopecia' 'non-alcoholic steatohepatitis'
+ 'squamous cell carcinoma' 'hereditary hyperbilirubinemia'
+ 'familial intrahepatic cholestasis' 'intrahepatic cholestasis'
+ 'colorectal cancer' 'digestive system disease'
+ 'drug-induced liver injury' 'epilepsy' 'primary biliary cholangitis'
+ 'functional gastric disease' 'cholestasis, intrahepatic, of pregnancy'
+ 'rheumatoid arthritis' 'Reynolds syndrome' 'colorectal carcinoma'
+ 'fatty liver disease' 'benign recurrent intrahepatic cholestasis'
+ 'alopecia']",You are an expert biomedical researcher.,"Name a disease that is related to a gene/protein that is associated with drug (1,10 Phenanthroline)-(Tri-Carbon Monoxide) Rhenium (I).
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to gene/protein ABCC2.,"Name a disease that is related to a gene/protein that is associated with drug (1,10 Phenanthroline)-(Tri-Carbon Monoxide) Rhenium (I).",Name all diseases that are related to gene/protein ABCC2.,"Name all diseases that are related to a gene/protein that is associated with drug (1,10 Phenanthroline)-(Tri-Carbon Monoxide) Rhenium (I)."
+gene/protein:disease,drug:gene/protein:disease,PLA2G2A,gene/protein,(1-Benzyl-5-methoxy-2-methyl-1H-indol-3-yl)acetic acid,drug,disease,"['neurotic disorder' 'endometriosis (disease)' 'arteriolosclerosis'
+ 'dysthymic disorder' 'arteriosclerosis disorder'
+ 'major affective disorder' 'ovarian endometriosis' 'atherosclerosis'
+ 'major depressive disorder' 'ischemia reperfusion injury'
+ 'myocardial ischemia' 'coronary artery disease' 'anxiety disorder'
+ 'endometriosis of uterus' 'bipolar disorder']",You are an expert biomedical researcher.,"Name a disease that is related to a gene/protein that is associated with drug (1-Benzyl-5-methoxy-2-methyl-1H-indol-3-yl)acetic acid.
+Just give me the answer without any explanations.
+Answer:
+",Name a disease that is related to gene/protein PLA2G2A.,Name a disease that is related to a gene/protein that is associated with drug (1-Benzyl-5-methoxy-2-methyl-1H-indol-3-yl)acetic acid.,Name all diseases that are related to gene/protein PLA2G2A.,Name all diseases that are related to a gene/protein that is associated with drug (1-Benzyl-5-methoxy-2-methyl-1H-indol-3-yl)acetic acid.

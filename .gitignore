@@ -1,0 +1,10 @@
+# Re-downloadable data; evaluation outputs remain reviewable.
+src/data/knowledge_graphs/
+src/data/benchmarks/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+src/kg_eval/archive/type-only-development/
+.venv-medgemma/
+# Generated model experiments can be large; keep their manifests/results on the server.
+experiments/medgemma27b/

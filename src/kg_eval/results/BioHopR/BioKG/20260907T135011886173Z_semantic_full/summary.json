@@ -1,0 +1,171 @@
+{
+  "completed_at": "2026-09-07T13:50:14.815666+00:00",
+  "protocol": {
+    "version": "3.0",
+    "task": "relation-aware biomedical retrieval",
+    "one_hop": "hop1 -> target_type",
+    "two_hop": "hop2 -> any node of hop1_type -> target_type",
+    "edge_predicates": "semantic mode enforces positive treatment, phenotype and side-effect edges; other associations pooled by type",
+    "direction": "traverse relations or their inverses according to requested endpoint types",
+    "matching": "casefolded preferred names with whitespace normalization; no fuzzy matching",
+    "ambiguous_start_names": "union of matching IDs, count reported; intermediate IDs never merged",
+    "answer_unit": "unique normalized preferred name; unlabelled IDs count as unmatched candidates",
+    "missing_question_or_fields_or_targets": "excluded, with explicit status",
+    "missing_nodes_or_unsupported_paths": "scored as zero; coverage and supported-only metrics also reported",
+    "aggregation": "macro average over applicable benchmark rows separately for each hop",
+    "interpretation": "agreement with released reference answers, not exhaustive biomedical truth or LLM accuracy"
+  },
+  "graph": {
+    "name": "BioKG",
+    "sources": [
+      {
+        "file": "C:\\Users\\mukta\\OneDrive\\Desktop\\MTP-1\\src\\data\\knowledge_graphs\\BioKG\\biokg-v1.0.0.zip",
+        "sha256": "e8277485db404683920ffb64ac22b55b025398af2db521212e76b8a5480c4967",
+        "url": "https://github.com/dsi-bdi/biokg/releases/download/v1.0.0/biokg.zip",
+        "bytes": 52377713,
+        "recorded_at": "2026-09-07T13:43:01.092220+00:00"
+      },
+      {
+        "file": "C:\\Users\\mukta\\OneDrive\\Desktop\\MTP-1\\src\\data\\knowledge_graphs\\Hetionet\\hetionet-v1.0-nodes.tsv",
+        "sha256": "3ad9eb86c031df8bc7d5efefa6edc93562182eb9a6a71e5129d3f18b9d42c50e",
+        "url": "https://raw.githubusercontent.com/hetio/hetionet/af668689a81952058df8b1321cc6c744b93d83e2/hetnet/tsv/hetionet-v1.0-nodes.tsv",
+        "bytes": 2509984,
+        "recorded_at": "2026-09-07T13:37:54.828782+00:00"
+      },
+      {
+        "file": "C:\\Users\\mukta\\OneDrive\\Desktop\\MTP-1\\src\\data\\knowledge_graphs\\labels\\uniprot-reviewed-human-gene-names.tsv",
+        "sha256": "0b1a6472dc68c032b25cb9fbb4cb21b36cf57c69d687d86cc8cb743565e99ee3",
+        "url": "https://rest.uniprot.org/uniprotkb/stream?query=%28organism_id%3A9606%29%20AND%20%28reviewed%3Atrue%29&format=tsv&fields=accession%2Cgene_primary",
+        "bytes": 277843,
+        "recorded_at": "2026-09-07T13:45:10.958529+00:00"
+      }
+    ],
+    "notes": [
+      "BioKG v1.0.0 main links plus explicit drug-side-effect property edges.",
+      "Protein projection includes only nodes tagged HUMAN in the release metadata.",
+      "Human protein labels use exact UniProt accession to primary gene-symbol mappings; native NAME is fallback.",
+      "Drug/MeSH labels are native metadata; phenotype CUI labels are exact-ID joins to Hetionet Side Effect nodes.",
+      "Unlabelled disease/phenotype nodes remain as unmatched candidates; no guessed names or PrimeKG topology.",
+      "Other property edges (including indication and ontology annotations) are outside this projection.",
+      "Drug-disease associations have no treatment predicate in this projection: semantic treatment queries are explicitly unsupported.",
+      "No disease-phenotype relation is supplied by this projection."
+    ],
+    "supported_constraints": [
+      "side_effect"
+    ],
+    "node_count": 52977,
+    "node_types": {
+      "gene/protein": 20368,
+      "drug": 13580,
+      "disease": 15025,
+      "effect/phenotype": 4004
+    },
+    "unlabelled_nodes": 3698,
+    "ambiguous_name_type_pairs": 56,
+    "adjacency_arcs": 3379007,
+    "input_edges": 1815426,
+    "retained_edge_rows": 1718372,
+    "edges_outside_projection": 97054,
+    "edge_rows_other_relations": 382992
+  },
+  "relation_policy": "semantic",
+  "environment": {
+    "python": "3.12.5",
+    "pandas": "2.2.2",
+    "numpy": "2.1.0",
+    "requests": "2.32.3",
+    "pyarrow": "23.0.1"
+  },
+  "benchmark_checks": {
+    "1": {
+      "unique_question_texts": 2494,
+      "questions_with_differing_answer_sets": 107
+    },
+    "2": {
+      "unique_question_texts": 7633,
+      "questions_with_differing_answer_sets": 0
+    }
+  },
+  "benchmark": {
+    "dataset": "knowlab-research/BioHopR",
+    "split": "train",
+    "revision": "08f06692c3900347e7405ba55ff6a6d330f55ddb",
+    "sha256": "1adda2f23d305c394537e7b56d3e972b2d8f4141ae716ede54e0d08876eb527d",
+    "url": "https://huggingface.co/datasets/knowlab-research/BioHopR/resolve/08f06692c3900347e7405ba55ff6a6d330f55ddb/BioHopR.json"
+  },
+  "n_available_samples": 7633,
+  "n_evaluated_samples": 7633,
+  "requested_max_samples": null,
+  "scope": "full",
+  "hops": {
+    "1": {
+      "n_rows": 7633,
+      "n_evaluated": 7633,
+      "n_excluded": 0,
+      "status_counts": {
+        "ok": 5238,
+        "unsupported_relation": 2018,
+        "start_not_found": 286,
+        "no_candidates": 91
+      },
+      "n_supported": 5615,
+      "n_start_found": 6358,
+      "n_ambiguous_starts": 0,
+      "start_coverage": 0.8329621380846325,
+      "hit_rate": 0.5739551945499803,
+      "recall": 0.2362292737173821,
+      "precision": 0.25141728071324143,
+      "f1": 0.22770508094379371,
+      "mean_predictions": 27.415039958076772,
+      "supported_only_hit_rate": 0.7802315227070348,
+      "start_found_only_hit_rate": 0.6890531613715005,
+      "n_unique_question_answer_pairs": 2753,
+      "unique_pair_hit_rate": 0.6047947693425354
+    },
+    "2": {
+      "n_rows": 7633,
+      "n_evaluated": 7633,
+      "n_excluded": 0,
+      "status_counts": {
+        "unsupported_relation": 3705,
+        "start_not_found": 2614,
+        "ok": 1251,
+        "no_candidates": 63
+      },
+      "n_supported": 3928,
+      "n_start_found": 3279,
+      "n_ambiguous_starts": 5,
+      "start_coverage": 0.42958207781999214,
+      "hit_rate": 0.1291759465478842,
+      "recall": 0.03259453649636825,
+      "precision": 0.03990467665228786,
+      "f1": 0.033637635683146476,
+      "mean_predictions": 2.750163762609721,
+      "supported_only_hit_rate": 0.2510183299389002,
+      "start_found_only_hit_rate": 0.30070143336383043,
+      "n_unique_question_answer_pairs": 7633,
+      "unique_pair_hit_rate": 0.1291759465478842
+    }
+  },
+  "code_sha256": {
+    "evaluate_kg.py": "46aa518dcde2f3e2a52683b714396865ce3c025360f5c47006bdc1f49a2ed305",
+    "kg_loader.py": "91a7a84251cde3c6d1cd63441c56b6a013b4469381949c2cc5505bfbb3dee41b",
+    "utils.py": "f831ae4ee477d3734cad1f9fbc211c2feb9aca2293248b914284c7267553db58",
+    "sources.py": "4578f319c1a945625123a7e4fc2fff7be14475b1725454b2b7c1210612b18ea1",
+    "visualize_kg.py": "de3454b68d57480a50fbbc8257ec96dea308287a183e91b7830f79c9336a719d"
+  },
+  "outputs": {
+    "metrics_by_type_path.csv": {
+      "sha256": "55fa55d563d3d436d8b22086011699d4938c9e08061f626ad9313f95f1ab347e",
+      "bytes": 3364
+    },
+    "per_question_metrics.csv": {
+      "sha256": "5d82dbd26fc1024f37b3293893e2e0276f9fbd93364c5a72815992e02b105ea3",
+      "bytes": 3103820
+    },
+    "plots\\retrieval_dashboard.png": {
+      "sha256": "eb9bba6143d9067387be8649702cc9e90c95f0f23a21ac245a1e0c8e4bf541d1",
+      "bytes": 290833
+    }
+  }
+}

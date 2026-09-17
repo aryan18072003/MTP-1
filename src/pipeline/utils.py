@@ -8,7 +8,7 @@ from huggingface_hub import login
 
 SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-HF_TOKEN = "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"
+HF_TOKEN = os.environ.get("HF_TOKEN", "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")
 EMBEDDER_NAME = "FremyCompany/BioLORD-2023-C"
 KG_CSV_PATH = os.path.join(SRC_DIR, "data", "kg.csv")
 KG_PARQUET_PATH = os.path.join(SRC_DIR, "data", "kg.parquet")
@@ -16,14 +16,14 @@ RESULTS_DIR = os.path.join(SRC_DIR, "results")
 COSINE_THRESHOLD = 0.9
 
 def get_dataset_dir(dataset_name):
-    # e.g., "knowlab-research/BioHopR" -> "BioHopR"
+    # "knowlab-research/BioHopR" -> "BioHopR"
     short_name = dataset_name.split("/")[-1]
     path = os.path.join(RESULTS_DIR, short_name)
     os.makedirs(path, exist_ok=True)
     return path
 
 def get_model_dir(dataset_name, model_name):
-    # e.g., "meta-llama/Llama-3.2-3B-Instruct" -> "Llama-3.2-3B-Instruct"
+    # "meta-llama/Llama-3.2-3B-Instruct" -> "Llama-3.2-3B-Instruct"
     d_path = get_dataset_dir(dataset_name)
     m_name = model_name.split("/")[-1]
     path = os.path.join(d_path, m_name)
@@ -33,7 +33,6 @@ def get_model_dir(dataset_name, model_name):
 def get_eval_results_path(dataset_name, model_name):
     return os.path.join(get_model_dir(dataset_name, model_name), "evaluation_results.csv")
 
-BIOHOPR_NODE_TYPES = ["drug", "disease", "gene/protein", "effect/phenotype"]
 
 
 def setup_device():
@@ -59,11 +58,12 @@ def load_kg():
     return kg_df
 
 
-def load_biohopr(dataset_name="knowlab-research/BioHopR"):
+def load_benchmark(dataset_name="knowlab-research/BioHopR"):
     print(f"Loading {dataset_name} benchmark dataset...")
-    biohopr = load_dataset(dataset_name)
-    benchmark_df = biohopr["train"].to_pandas()
-    print(f"Benchmark loaded: {benchmark_df.shape[0]:,} samples")
+    ds = load_dataset(dataset_name)
+    split = list(ds.keys())[0]
+    benchmark_df = ds[split].to_pandas()
+    print(f"Benchmark loaded: {benchmark_df.shape[0]:,} samples (split: {split})")
     return benchmark_df
 
 
@@ -74,7 +74,7 @@ def load_llm(device, model_name="meta-llama/Llama-3.2-3B-Instruct"):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        dtype=torch.bfloat16 if device == "cuda" else torch.float16,
+        torch_dtype="auto",
         device_map="auto" if device == "cuda" else None,
         low_cpu_mem_usage=True,
     )
@@ -99,12 +99,20 @@ def load_embedder(device):
 
 
 def generate_answer(llm_pipe, question: str) -> str:
-    messages = [
-        {"role": "system", "content": "Provide exactly one specific answer."},
-        {"role": "user", "content": question},
-    ]
-    outputs = llm_pipe(messages, max_new_tokens=50, do_sample=False)
-    return outputs[0]["generated_text"][-1]["content"].strip()
+    tokenizer = llm_pipe.tokenizer
+    if tokenizer.chat_template is not None:
+        messages = [
+            {"role": "system", "content": "Provide exactly one specific answer."},
+            {"role": "user", "content": question},
+        ]
+        outputs = llm_pipe(messages, max_new_tokens=50, do_sample=False)
+        return outputs[0]["generated_text"][-1]["content"].strip()
+    else:
+        prompt = f"Question: {question}\nAnswer:"
+        outputs = llm_pipe(prompt, max_new_tokens=50, do_sample=False)
+        generated = outputs[0]["generated_text"]
+        answer = generated[len(prompt):].strip()
+        return answer.split("\n")[0].strip()
 
 
 def evaluate_instance(embedder, prediction: str, targets, threshold: float = COSINE_THRESHOLD):

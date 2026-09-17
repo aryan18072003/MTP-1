@@ -1,0 +1,8 @@
+pandas>=2.2,<3
+numpy>=1.26,<3
+pyarrow>=15
+requests>=2.31,<3
+matplotlib>=3.8,<4
+seaborn>=0.13,<1
+# Only needed for datasets other than the pinned BioHopR JSON:
+datasets>=2.18,<5

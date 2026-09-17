@@ -1,0 +1,13 @@
+# Linux Python 3.11. Install the CUDA PyTorch wheel first (see RUN_REMOTE.md).
+transformers==4.57.6
+accelerate==1.12.0
+bitsandbytes==0.48.2
+sentence-transformers==5.2.0
+# Transformers 4.57.x requires Hugging Face Hub below 1.0.
+huggingface-hub>=0.34.0,<1.0
+pandas>=2.2,<2.3
+numpy>=1.26,<3
+requests>=2.32,<3
+pyarrow>=15
+matplotlib>=3.8,<4
+filelock>=3.16,<4

@@ -1,6 +1,5 @@
-
 from utils import (
-    setup_device, authenticate_hf, load_kg, load_biohopr,
+    setup_device, authenticate_hf, load_benchmark,
     load_llm, load_embedder,
     generate_answer, evaluate_instance,
 )
@@ -17,8 +16,7 @@ if __name__ == "__main__":
     authenticate_hf()
     device = setup_device()
 
-    kg_df = load_kg()
-    benchmark_df = load_biohopr(args.dataset)
+    benchmark_df = load_benchmark(args.dataset)
 
     llm_pipe = load_llm(device, args.model)
     embedder = load_embedder(device)

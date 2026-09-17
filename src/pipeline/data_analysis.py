@@ -1,4 +1,3 @@
-
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -6,7 +5,7 @@ import matplotlib.ticker as ticker
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from utils import load_kg, load_biohopr, ensure_results_dir, RESULTS_DIR, get_dataset_dir
+from utils import load_kg, load_benchmark, ensure_results_dir, RESULTS_DIR, get_dataset_dir
 import os
 import argparse
 
@@ -97,6 +96,11 @@ def analyze_biohopr(benchmark_df, dataset_name):
 
     print(f"\nColumns: {list(benchmark_df.columns)}")
     print(f"Total samples: {benchmark_df.shape[0]:,}")
+
+    out_dir = get_dataset_dir(dataset_name)
+    sample_path = os.path.join(out_dir, "raw_sample.csv")
+    benchmark_df.head(10).to_csv(sample_path, index=False)
+    print(f"  Saved raw_sample.csv (first 10 rows) to {out_dir}")
 
     has_hop2 = benchmark_df["hop2"].notna() & (benchmark_df["hop2"] != "")
     n_1hop = (~has_hop2).sum()
@@ -190,7 +194,7 @@ if __name__ == "__main__":
 
     ensure_results_dir()
     kg_df = load_kg()
-    benchmark_df = load_biohopr(args.dataset)
+    benchmark_df = load_benchmark(args.dataset)
     analyze_kg(kg_df)
     analyze_biohopr(benchmark_df, args.dataset)
     print("\n Step 1 complete - all plots saved to results/")
