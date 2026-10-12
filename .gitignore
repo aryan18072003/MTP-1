@@ -8,3 +8,4 @@ src/kg_eval/archive/type-only-development/
 .venv-medgemma/
 # Generated model experiments can be large; keep their manifests/results on the server.
 experiments/medgemma27b/
+src/medgemma_baseline/results/

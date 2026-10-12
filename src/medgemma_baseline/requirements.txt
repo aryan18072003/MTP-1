@@ -1,0 +1,2 @@
+# Shared tested inference/scoring versions. Install CUDA PyTorch first (README).
+-r ../medgemma_eval/requirements.txt
