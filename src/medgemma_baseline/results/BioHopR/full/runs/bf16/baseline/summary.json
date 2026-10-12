@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "variant": "baseline",
+  "created_at": "2026-10-12T16:03:05.469272+00:00",
+  "scoring": {
+    "scorer": "both",
+    "exact_rule": "casefold_collapse_whitespace_full_response_v1",
+    "implementation_sha256": "7ca76e75cb7dfae7caf27f0715577b717065fe74d45fe99573a1d751517a6d33",
+    "runtime_versions": {
+      "sentence-transformers": "5.2.0",
+      "transformers": "4.57.6",
+      "torch": "2.8.0+cu128",
+      "numpy": "2.2.6"
+    },
+    "semantic_rule": "full_response_max_cosine_strictly_greater_v1",
+    "threshold": 0.9,
+    "embedder": "FremyCompany/BioLORD-2023-C",
+    "embedder_revision_requested": null,
+    "embedder_revision_resolved": "4bb5abd13930002136e3a5750b84474763c775c5",
+    "embedder_device": "cpu"
+  },
+  "provenance": {
+    "prepared_manifest_sha256": "909fa1850b6b18843d1e7d1f699d9224c4879447d1958e95355386e7e196ae04",
+    "question_file_sha256": "384ababe37c6206e7eff65fd97736f5818c2e403af465c52a5a44a47a96177d4",
+    "run_config_sha256": "2b6ebf0b2f8186c77872bee08c5b0618064481ae651fc1d945d40cbdc416286f",
+    "run_file_sha256": "9473fb358e347e3e2a920183f445725ab3f8d1e9ef93216c9d1a731116af0272",
+    "predictions_sha256": "80c86e34737cb5464a2f825f45ebda3fea9840a730392c6b86dc189a8ea8aa35",
+    "metrics_sha256": "f7e89018114045c0df51112d3ce7dde95359ffb313320dfadb9973b620772350"
+  },
+  "overall": {
+    "n_questions": 15266,
+    "n_applicable": 15266,
+    "status_counts": {
+      "ok": 15266
+    },
+    "context_status_counts": {
+      "baseline": 15266
+    },
+    "n_with_evidence": 0,
+    "exact_accuracy": 0.1812524564391458,
+    "cosine_accuracy": 0.20437573693174374
+  },
+  "by_hop": {
+    "1": {
+      "n_questions": 7633,
+      "n_applicable": 7633,
+      "status_counts": {
+        "ok": 7633
+      },
+      "context_status_counts": {
+        "baseline": 7633
+      },
+      "n_with_evidence": 0,
+      "exact_accuracy": 0.2646403773090528,
+      "cosine_accuracy": 0.300930171623215
+    },
+    "2": {
+      "n_questions": 7633,
+      "n_applicable": 7633,
+      "status_counts": {
+        "ok": 7633
+      },
+      "context_status_counts": {
+        "baseline": 7633
+      },
+      "n_with_evidence": 0,
+      "exact_accuracy": 0.09786453556923883,
+      "cosine_accuracy": 0.1078213022402725
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "created_at": "2026-10-12T12:49:08.534995+00:00",
+  "benchmark": {
+    "dataset": "knowlab-research/BioHopR",
+    "split": "train",
+    "revision": "08f06692c3900347e7405ba55ff6a6d330f55ddb",
+    "sha256": "1adda2f23d305c394537e7b56d3e972b2d8f4141ae716ede54e0d08876eb527d",
+    "url": "https://huggingface.co/datasets/knowlab-research/BioHopR/resolve/08f06692c3900347e7405ba55ff6a6d330f55ddb/BioHopR.json"
+  },
+  "selection": {
+    "method": "all",
+    "max_samples": null,
+    "n_available_samples": 7633
+  },
+  "n_samples": 7633,
+  "n_questions": 15266,
+  "n_applicable_questions": 15266,
+  "kgs": [],
+  "contexts": {},
+  "retrieval": {
+    "enabled": false
+  },
+  "question_file": {
+    "file": "questions.jsonl",
+    "sha256": "384ababe37c6206e7eff65fd97736f5818c2e403af465c52a5a44a47a96177d4"
+  },
+  "questions_file": "questions.jsonl",
+  "questions_sha256": "384ababe37c6206e7eff65fd97736f5818c2e403af465c52a5a44a47a96177d4",
+  "preparation_request": {
+    "task": "biohopr_medgemma_model_only_v1",
+    "benchmark": {
+      "dataset": "knowlab-research/BioHopR",
+      "split": "train",
+      "revision": "08f06692c3900347e7405ba55ff6a6d330f55ddb",
+      "sha256": "1adda2f23d305c394537e7b56d3e972b2d8f4141ae716ede54e0d08876eb527d",
+      "url": "https://huggingface.co/datasets/knowlab-research/BioHopR/resolve/08f06692c3900347e7405ba55ff6a6d330f55ddb/BioHopR.json"
+    },
+    "selection": {
+      "method": "all",
+      "max_samples": null,
+      "n_available_samples": 7633
+    },
+    "code_sha256": {
+      "medgemma_baseline/prepare.py": "6957a203005d7699d3a91dc31ed1aba9cf2199811dfa2b6f40bde1cd7d388c33",
+      "medgemma_eval/prepare.py": "04abe58f20df25ff7e182238969db4d0efac0cd01722c07a602f4a7fac214ed2",
+      "kg_eval/utils.py": "7cd692f912e4c3579700f4cb118be3a097be053b292b11a0f5e4a6cd6c2f8ba0"
+    }
+  },
+  "code_sha256": {
+    "medgemma_baseline/prepare.py": "6957a203005d7699d3a91dc31ed1aba9cf2199811dfa2b6f40bde1cd7d388c33",
+    "medgemma_eval/prepare.py": "04abe58f20df25ff7e182238969db4d0efac0cd01722c07a602f4a7fac214ed2",
+    "kg_eval/utils.py": "7cd692f912e4c3579700f4cb118be3a097be053b292b11a0f5e4a6cd6c2f8ba0"
+  }
+}
